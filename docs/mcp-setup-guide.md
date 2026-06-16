@@ -101,6 +101,13 @@ uv pip install mcp
 
 **安装**：参考 [mempalace 文档](https://github.com/MemPalace/mempalace) 在 Claude Code 全局配置中注册。
 
+**与本项目的适配**：
+- **知识图谱**：建模算法知识点的前置关系（如 DP ← 背包问题、二分 ← 有序数组），当用户在某知识点反复出错时，自动推荐关联的前置知识点复习。
+- **Agent 日记**：每次练习 session 结束后记录学习观察（哪些模式掌握了、哪些还有盲区），构建可搜索的长期学习历史。
+- **跨 wing 关联**：将备考知识与项目实战、面试准备笔记关联，形成完整的知识网络。
+- **适合配合的 Skill**：review-tracker（知识图谱查覆盖缺口）、exam-assistant（结构化检索历史洞察）。
+- 项目内 Skill 不直接调用 MemPalace 工具，通过 Claude Code 手动使用。
+
 ### 2.3 onefind
 
 **用途**：本地知识库检索（Obsidian、Zotero 等）。
@@ -110,6 +117,13 @@ uv pip install mcp
 - 文献库中的参考论文
 
 **安装**：参考 [onefind 文档](https://github.com/iawnfoanaowt/OneFind) 在 Claude Code 全局配置中注册。
+
+**与本项目的适配**：
+- **Obsidian 笔记检索**：练习时搜索已有的 ML/算法笔记，将外部学习记录与项目内的 `llm/` 速记资料互补。
+- **Zotero 文献检索**：为 Transformer、GNN、Diffusion 等主题速记资料检索参考论文，补充深度理解。
+- **混合检索**：对所有本地源执行词法 + 语义联合搜索，适合查找"之前在哪里看过这个知识点"。
+- **适合配合的 Skill**：choice-q-create（从笔记中搜索出题素材）、exam-assistant（解答时检索参考资料）、review-tracker（检查笔记是否覆盖考试知识点）。
+- 项目内 Skill 不直接调用 OneFind 工具，通过 Claude Code 手动使用。
 
 ---
 

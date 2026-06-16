@@ -117,6 +117,30 @@ All skills with "Optional" MCP degrade gracefully to local-only mode when MCP is
 
 Install ChatMem and register it in your Claude Code global config. See [MCP Setup Guide](docs/mcp-setup-guide.md).
 
+### MemPalace Enhancement (Optional)
+
+[MemPalace](https://github.com/MemPalace/mempalace) provides structured knowledge storage with cross-wing knowledge graphs. Best suited for long-term knowledge management beyond a single exam cycle:
+
+| Use Case | How It Helps |
+|----------|-------------|
+| Knowledge graph | Map prerequisite relationships (e.g., DP ← knapsack, binary search ← sorted array) for targeted review |
+| Agent diary | Record learning observations per session; build a searchable history of "what I learned" |
+| Cross-project knowledge | Link exam prep notes with project work, interview prep, or research notes |
+
+Best paired with review-tracker (knowledge graph for coverage gaps) and exam-assistant (structured retrieval of prior insights). Not directly called by any bundled skill — use MemPalace tools manually via Claude Code.
+
+### OneFind Enhancement (Optional)
+
+[OneFind](https://github.com/iawnfoanaowt/OneFind) retrieves content from your local knowledge base (Obsidian vaults, Zotero libraries, folders). Useful if you already maintain study notes outside this project:
+
+| Use Case | How It Helps |
+|----------|-------------|
+| Obsidian notes | Search your existing ML/algorithm notes for related concepts when practicing |
+| Zotero library | Retrieve reference papers for Transformer, GNN, Diffusion topics in `llm/` cheatsheets |
+| Hybrid search | Combine lexical + semantic search across all local sources |
+
+Best paired with choice-q-create (search notes for question material), exam-assistant (retrieve references during explanation), and review-tracker (check if your notes cover the required topics). Not directly called by any bundled skill — use OneFind tools manually via Claude Code.
+
 ## Roadmap
 
 ### V1 (Current) — Stable
