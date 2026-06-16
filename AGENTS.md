@@ -53,7 +53,7 @@ This project is an **execution harness**, not a knowledge base. Every component 
 ### Component Map
 
 ```
-pass-llm-with-llm/
+Pass-LLM-with-LLM/
   AGENTS.md                    # This file. Harness rules, skill pipeline, component map.
   START_HERE.md                # Session bootstrap order (read this first each session).
   HANDOFF.md                   # Session handoff: what was done, what's next, blockers.

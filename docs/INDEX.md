@@ -32,7 +32,7 @@
 
 | 文件 | 说明 | 状态 |
 |------|------|------|
-| [open-source-plan.md](open-source-plan.md) | 开源方案：项目改名 pass-llm-with-llm、README 重写、敏感数据清理、分支策略、执行步骤 | 基本完成（P1/P2 部分待执行） |
+| [open-source-plan.md](open-source-plan.md) | 开源方案：项目改名 Pass-LLM-with-LLM、README 重写、敏感数据清理、分支策略、执行步骤 | 基本完成（P1/P2 部分待执行） |
 
 ## 协作规范
 

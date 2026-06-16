@@ -1,4 +1,4 @@
-# 开源方案 — pass-llm-with-llm
+# 开源方案 — Pass-LLM-with-LLM
 
 > 创建日期：2026-06-16 | 状态：P0 基本完成，P1 待执行
 > 分支：`feat/open-source`（从 `ai-lab-0616-prep` 切出）
@@ -14,7 +14,7 @@
 
 ## 1. 项目定位
 
-**新名称**：`pass-llm-with-llm`
+**新名称**：`Pass-LLM-with-LLM`
 **Slogan**：用 LLM 备考 LLM 笔试 — Claude Code Skills 驱动的 AI 笔试备考引擎
 
 **核心卖点**：
@@ -31,7 +31,7 @@
 ## 2. 仓库命名与远程地址
 
 ```
-GitHub: github.com/Tenstu/pass-llm-with-llm
+GitHub: github.com/Tenstu/Pass-LLM-with-LLM
 ```
 
 ## 3. 开源前必须完成的改动
@@ -44,7 +44,7 @@ GitHub: github.com/Tenstu/pass-llm-with-llm
 | 2 | 更新 `.gitignore` | 移除 `docs/`，加入个人数据目录忽略规则，保留目录框架 | **已完成** |
 | 3 | 重写 `README.md` | 中英文双版（README.md 英文 + README_CN.md 中文） | **已完成** |
 | 4 | `git mv docs/contributing-guide.md CONTRIBUTING.md` | GitHub 自动识别 PR 提示 | **已完成** |
-| 5 | 重命名项目目录 | `pdd-llm-algo-exam-harness` → `pass-llm-with-llm` | 可选（仅影响本地目录名，GitHub 仓库已正确命名） |
+| 5 | 重命名项目目录 | `pdd-llm-algo-exam-harness` → `Pass-LLM-with-LLM` | 可选（仅影响本地目录名，GitHub 仓库已正确命名） |
 | 6 | 清理 git 中已跟踪的敏感文件 | `git rm --cached` 移除 `.claude/settings.json`、daily/、progress/ 个人数据 | **已完成** |
 
 ### 3.2 P1 — 建议完成
@@ -63,7 +63,7 @@ GitHub: github.com/Tenstu/pass-llm-with-llm
 | 16 | 环境支持文档 | `docs/environment-support.md`：model provider、IDE 集成、开发环境记录 | **已完成** |
 | 17 | README 环境支持章节 | README.md + README_CN.md 新增 Supported Environments | **已完成** |
 | 18 | 清理 PDD 真题文件 | 重命名 `p1_letter_ring_substring.md` → `example_ring_substring.md` | **已完成** |
-| 19 | AGENTS.md 项目名修正 | Component Map 中 `pdd-llm-algo-exam-harness` → `pass-llm-with-llm` | **已完成** |
+| 19 | AGENTS.md 项目名修正 | Component Map 中 `pdd-llm-algo-exam-harness` → `Pass-LLM-with-LLM` | **已完成** |
 
 ### 3.3 P2 — 可选
 
@@ -167,5 +167,5 @@ Step 10: 合并到 main，推送 GitHub                               待执行
 | git history 中有个人数据 | 使用 `git filter-branch` 或 `git filter-repo` 清理（如需要） |
 | exam_memory/ 被意外提交 | .gitignore 已覆盖，执行 Step 4 确保 |
 | AGENTS.md 包含具体日期 | 精简时泛化为"短期冲刺备考" |
-| 项目名含 "pdd" | 重命名为 pass-llm-with-llm |
+| 项目名含 "pdd" | 重命名为 Pass-LLM-with-LLM |
 | MCP Server 依赖未声明 | 添加 `exam_memory/pyproject.toml` 依赖说明到 README |

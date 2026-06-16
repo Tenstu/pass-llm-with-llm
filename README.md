@@ -1,4 +1,4 @@
-# pass-llm-with-llm
+# Pass-LLM-with-LLM
 
 > Use LLM to pass LLM exams — a Claude Code Skills + MCP powered AI exam preparation engine
 
@@ -39,8 +39,8 @@ This project was developed using the **Claude Code VS Code extension** with thir
 ### Install
 
 ```bash
-git clone https://github.com/Tenstu/pass-llm-with-llm.git
-cd pass-llm-with-llm
+git clone https://github.com/Tenstu/Pass-LLM-with-LLM.git
+cd Pass-LLM-with-LLM
 ```
 
 ### Use
@@ -55,7 +55,7 @@ cd pass-llm-with-llm
 ### Startup Order
 
 ```
-git clone → cd pass-llm-with-llm
+git clone → cd Pass-LLM-with-LLM
   │
   ├── pip install mcp               # optional: for exam-memory MCP server
   │
@@ -184,7 +184,7 @@ Upgrade `exam-memory` from keyword matching to semantic search:
 ## Directory Structure
 
 ```
-pass-llm-with-llm/
+Pass-LLM-with-LLM/
   AGENTS.md                    # Project rules, Component Map, Skill Pipeline
   START_HERE.md                # Session bootstrap + Skill invocation guide
   HANDOFF.md                   # Session handoff template

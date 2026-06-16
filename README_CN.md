@@ -1,4 +1,4 @@
-# pass-llm-with-llm
+# Pass-LLM-with-LLM
 
 > 用 LLM 备考 LLM 笔试 — 基于 Claude Code Skills + MCP 的 AI 笔试备考引擎
 
@@ -39,8 +39,8 @@
 ### 安装
 
 ```bash
-git clone https://github.com/Tenstu/pass-llm-with-llm.git
-cd pass-llm-with-llm
+git clone https://github.com/Tenstu/Pass-LLM-with-LLM.git
+cd Pass-LLM-with-LLM
 ```
 
 ### 使用
@@ -55,7 +55,7 @@ cd pass-llm-with-llm
 ### 启动顺序
 
 ```
-git clone → cd pass-llm-with-llm
+git clone → cd Pass-LLM-with-LLM
   │
   ├── pip install mcp               # 可选：安装 exam-memory MCP Server 依赖
   │
@@ -184,7 +184,7 @@ OneFind 的 **folder source** 可以索引 `exam_memory/experiences/` 目录，�
 ## 目录结构
 
 ```
-pass-llm-with-llm/
+Pass-LLM-with-LLM/
   AGENTS.md                    # 项目规则、Component Map、Skill Pipeline
   START_HERE.md                # Session 启动引导 + Skill 调用指南
   HANDOFF.md                   # Session 交接模板
