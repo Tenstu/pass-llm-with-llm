@@ -8,7 +8,7 @@ Primary goal: maximize the chance of passing the written exam.
 
 Secondary goal: keep only the minimum useful interview preparation for follow-up interviews.
 
-**使用前配置**：在 `START_HERE.md` 或 `HANDOFF.md` 中填写你的目标考试、日期和每日可投入时间。
+**使用前配置**：运行 `init-guide`（说 "init"）自动配置备考目标、日期和每日可投入时间，或手动编辑 `HANDOFF.md`。
 
 ## Exam Format（默认配置，按目标考试调整）
 

@@ -10,7 +10,7 @@ Skill(skill="init-guide")
 
 触发词："初始化"、"init"、"第一次用"、"开始配置"、"换一个考试目标"
 
-init-guide 会引导你填写备考目标、考试范围、目标日期，并自动更新配置文件。
+init-guide 会引导你填写备考目标、考试范围、目标日期、每日投入时间，并自动更新 HANDOFF.md、sources/、AGENTS.md 和用户画像。
 
 > **MCP 配置**：如需启用跨会话经验持久化，参见 `docs/mcp-setup-guide.md`。所有 Skill 在 MCP 不可用时自动降级为纯本地模式。
 

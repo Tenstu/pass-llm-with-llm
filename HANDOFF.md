@@ -6,6 +6,7 @@
 
 - Date: YYYY-MM-DD.
 - Target exam: <考试名称>，<日期>。
+- Daily study hours: <X>h.
 - Current objective: <当前阶段目标>。
 - Strategy: <配比说明>。
 
