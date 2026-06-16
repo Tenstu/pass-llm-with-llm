@@ -104,6 +104,19 @@ git clone → cd pass-llm-with-llm
 
 标记"可选"的 Skill 在 MCP 不可用时自动降级为纯本地模式。
 
+### ChatMem 增强（推荐）
+
+[ChatMem](https://github.com/Rimagination/ChatMem/releases) 提供跨会话对话记忆。非必需，但能显著提升以下 Skill 的体验：
+
+| Skill | ChatMem 增强效果 |
+|-------|-----------------|
+| review-tracker | 存储历史进度报告，实现跨会话趋势对比 |
+| exam-assistant | 回溯之前的答题会话和错题讨论，保持学习连续性 |
+| init-guide | 记忆上次配置过程，避免重复收集已知信息 |
+| solve-analyze | 跨会话关联诊断历史，识别反复出现的错误模式 |
+
+安装 ChatMem 并在 Claude Code 全局配置中注册。详见 [MCP 配置指南](docs/mcp-setup-guide.md)。
+
 ## 路线图
 
 ### V1（当前）— 稳定版

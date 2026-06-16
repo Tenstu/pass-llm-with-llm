@@ -53,8 +53,8 @@ GitHub: github.com/Tenstu/pass-llm-with-llm
 |------|------|------|------|
 | 7 | 精简 `AGENTS.md` | 移除个人色彩内容（具体日期、岗位 JD），保留技术架构 | **已完成** |
 | 8 | 更新 `.mcp.json` | 当前为空 `{}`，可加注释说明配置方式 | **已完成**（在 docs/mcp-setup-guide.md 中提供模板） |
-| 9 | 添加 `.github/ISSUE_TEMPLATE/` | Bug report + Feature request 模板 | 待执行 |
-| 10 | 添加 `.github/PULL_REQUEST_TEMPLATE.md` | PR 模板 | 待执行 |
+| 9 | 添加 `.github/ISSUE_TEMPLATE/` | Bug report + Feature request 模板 | **已完成** |
+| 10 | 添加 `.github/PULL_REQUEST_TEMPLATE.md` | PR 模板 | **已完成** |
 | 11 | MCP 配置指南 | `docs/mcp-setup-guide.md`：exam-memory 注册 + 外部 MCP 引用 + 启动顺序 | **已完成** |
 | 12 | init-guide Skill | `skills/init-guide.md`：首次使用导引，收集备考目标，更新画像 | **已完成** |
 | 13 | README Startup Order | README.md + README_CN.md 新增启动顺序图、MCP 依赖说明表 | **已完成** |

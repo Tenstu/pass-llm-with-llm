@@ -104,6 +104,19 @@ All skills degrade gracefully to local-only mode when MCP is unavailable. See [M
 
 All skills with "Optional" MCP degrade gracefully to local-only mode when MCP is unavailable.
 
+### ChatMem Enhancement (Recommended)
+
+[ChatMem](https://github.com/Rimagination/ChatMem/releases) provides cross-session conversation memory. While not required, it significantly improves these skills:
+
+| Skill | With ChatMem |
+|-------|-------------|
+| review-tracker | Stores historical progress reports; enables cross-session trend comparison |
+| exam-assistant | Recalls prior quiz sessions and error discussions for continuity |
+| init-guide | Remembers previous onboarding attempts; avoids re-collecting known info |
+| solve-analyze | Links diagnosis history across sessions for pattern recognition |
+
+Install ChatMem and register it in your Claude Code global config. See [MCP Setup Guide](docs/mcp-setup-guide.md).
+
 ## Roadmap
 
 ### V1 (Current) — Stable
