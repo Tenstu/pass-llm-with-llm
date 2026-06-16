@@ -43,14 +43,10 @@ git clone https://github.com/Tenstu/pass-llm-with-llm.git
 cd pass-llm-with-llm
 ```
 
-### 配置目标考试
-
-编辑 `HANDOFF.md`，填写你的目标考试名称、日期和每日可投入时间。在 `sources/` 下补充目标考试的历史题型分析。
-
 ### 使用
 
 1. 在 Claude Code 中打开项目目录
-2. **首次使用？** 说 "init" 或 "初始化" 启动导引流程 — 收集备考目标、考试范围、目标日期
+2. **首次使用？** 说 "init" 或 "初始化" — init-guide 会收集你的备考目标、日期和每日可投入时间，自动配置 `HANDOFF.md`、`sources/`、`AGENTS.md` 和用户画像
 3. 日常使用：阅读 `START_HERE.md` 了解 session 启动流程
 4. 遇到算法题：`Skill(skill="solve-skeleton")`
 5. 需要诊断：`Skill(skill="solve-analyze")`
@@ -67,7 +63,8 @@ git clone → cd pass-llm-with-llm
   │
   ├── 在 Claude Code 中打开项目
   │     │
-  │     ├── 首次使用 → 说 "init" → init-guide Skill 引导完成配置
+  │     ├── 首次使用 → 说 "init" → init-guide 自动完成全部配置
+  │     │     （HANDOFF.md、sources/、AGENTS.md、用户画像）
   │     │
   │     └── 日常使用 → 读 START_HERE.md → Skill Pipeline
   │

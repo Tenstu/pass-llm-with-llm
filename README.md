@@ -43,14 +43,10 @@ git clone https://github.com/Tenstu/pass-llm-with-llm.git
 cd pass-llm-with-llm
 ```
 
-### Configure Your Target Exam
-
-Edit `HANDOFF.md` with your exam name, date, and daily study hours. Update `sources/` with your exam's historical patterns.
-
 ### Use
 
 1. Open the project in Claude Code
-2. **First time?** Say "init" or "初始化" to launch the onboarding guide — it collects your exam target, date, and scope
+2. **First time?** Say "init" or "初始化" — the init-guide skill will collect your exam target, date, and daily study hours, then configure `HANDOFF.md`, `sources/`, `AGENTS.md`, and user profile automatically
 3. Daily use: read `START_HERE.md` for session bootstrap
 4. For algorithm problems: `Skill(skill="solve-skeleton")`
 5. For diagnosis: `Skill(skill="solve-analyze")`
@@ -67,7 +63,8 @@ git clone → cd pass-llm-with-llm
   │
   ├── open in Claude Code
   │     │
-  │     ├── first time → say "init" → init-guide Skill walks you through setup
+  │     ├── first time → say "init" → init-guide auto-configures everything
+  │     │     (HANDOFF.md, sources/, AGENTS.md, user profile)
   │     │
   │     └── daily use → read START_HERE.md → Skill Pipeline
   │

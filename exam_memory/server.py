@@ -8,6 +8,7 @@ import asyncio
 import glob
 import json
 import os
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -28,7 +29,7 @@ EXPERIENCES_DIR.mkdir(parents=True, exist_ok=True)
 TOOL_SCHEMAS = [
     Tool(
         name="list_experiences",
-        description="按题型列出经验条目，按 error_count 降序返回前 limit 条全文。",
+        description="按题型列出经验条目，按 error_count 降序返回前 limit 条全文。支持 query 参数进行语义检索。",
         inputSchema={
             "type": "object",
             "properties": {
@@ -41,6 +42,10 @@ TOOL_SCHEMAS = [
                     "type": "integer",
                     "default": 5,
                     "description": "最多返回条数",
+                },
+                "query": {
+                    "type": "string",
+                    "description": "语义检索查询文本（可选）。为空时按 error_count 降序返回。",
                 },
             },
             "required": ["type"],
@@ -183,6 +188,42 @@ def _search_ddg(query: str) -> str:
     return "此工具已废弃，请使用 Claude Code 内置 WebSearch 进行联网搜索。"
 
 
+def _list_experiences_legacy(
+    exp_type: str, limit: int
+) -> list[TextContent]:
+    items = _load_all_experiences(exp_type)
+    if not items:
+        return [TextContent(type="text", text=f"暂无「{exp_type}」类经验。")]
+    top = items[:limit]
+    parts = []
+    for i, (_, content) in enumerate(top, 1):
+        parts.append(f"### 经验 {i}\n{content}")
+    return [TextContent(type="text", text="\n---\n".join(parts))]
+
+
+def _list_experiences_semantic(
+    exp_type: str, query: str, limit: int
+) -> list[TextContent]:
+    try:
+        from exam_memory.vector_store import NumpyVectorStore
+        store = NumpyVectorStore()
+        results = store.search(query, top_k=limit, type_filter=exp_type)
+    except Exception:
+        results = []
+
+    if not results:
+        return [TextContent(
+            type="text",
+            text=f"语义检索「{query}」在「{exp_type}」类型中未找到匹配经验。"
+        )]
+
+    parts = []
+    for i, r in enumerate(results, 1):
+        score = r["score"]
+        parts.append(f"### 经验 {i} (相关度: {score})\n{r['text']}")
+    return [TextContent(type="text", text="\n---\n".join(parts))]
+
+
 # ── MCP Server ────────────────────────────────────────────
 
 app = Server("exam-memory")
@@ -199,14 +240,12 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
     if name == "list_experiences":
         exp_type = arguments["type"]
         limit = arguments.get("limit", 5)
-        items = _load_all_experiences(exp_type)
-        if not items:
-            return [TextContent(type="text", text=f"暂无「{exp_type}」类经验。")]
-        top = items[:limit]
-        parts = []
-        for i, (_, content) in enumerate(top, 1):
-            parts.append(f"### 经验 {i}\n{content}")
-        return [TextContent(type="text", text="\n---\n".join(parts))]
+        query = arguments.get("query", "")
+
+        if query:
+            return _list_experiences_semantic(exp_type, query, limit)
+        else:
+            return _list_experiences_legacy(exp_type, limit)
 
     # ── save_experience ──
     if name == "save_experience":
@@ -233,6 +272,17 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
         yaml_str = yaml.dump(frontmatter, allow_unicode=True, default_flow_style=False)
         doc = f"---\n{yaml_str}---\n\n## {title}\n\n{content}\n"
         filepath.write_text(doc, encoding="utf-8")
+
+        # 静默向量化入库（失败不影响保存结果）
+        try:
+            from exam_memory.vector_store import NumpyVectorStore
+            store = NumpyVectorStore()
+            meta = dict(frontmatter)
+            meta["file_name"] = filename
+            store.upsert(filename, doc, meta)
+        except Exception:
+            pass
+
         return [TextContent(type="text", text=f"已保存: {filename}")]
 
     # ── inc_error_count ──
