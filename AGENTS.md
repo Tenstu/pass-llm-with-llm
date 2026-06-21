@@ -31,7 +31,7 @@ Keep files in their lane:
 |------|-----------------|
 | Session bootstrap | `START_HERE.md` |
 | Current target, last work, next action | `HANDOFF.md` |
-| User-facing setup and directory guide | `README.md`, `README_CN.md` |
+| User-facing setup and directory guide | `README.md` |
 | Detailed skill behavior | `skills/` |
 | Target-specific practice state | `targets/{target}/` |
 | Shared daily logs and optional MCP source | `shared/` |
@@ -146,7 +146,7 @@ Never use `git add -f .`, and never force-add dev-only material on `main` or dur
 | Topic | Read |
 |-------|------|
 | Startup sequence and manual fallback | `START_HERE.md` |
-| Public user guide and MCP setup | `README.md`, `README_CN.md` |
+| Public user guide and MCP setup | `README.md` |
 | Current dev roadmap and docs status | `docs/INDEX.md`, `docs/dev-roadmap.md` |
 | Main / dev extraction rules | `docs/branch-workflow.md` |
 | Skill-specific behavior | relevant file under `skills/` |

@@ -24,5 +24,5 @@ If you have ideas, describe a feasible implementation approach.
 - [ ] MCP Server (`shared/exam_memory/`)
 - [ ] Target material (`targets/{target}/`)
 - [ ] Shared cheatsheets or prompts (`shared/`, `prompts/`)
-- [ ] Public documentation (`README`, `README_CN`, `START_HERE`, `AGENTS`, `CONTRIBUTING`)
+- [ ] Public documentation (`README`, `START_HERE`, `AGENTS`, `CONTRIBUTING`)
 - [ ] Other: ___
