@@ -162,7 +162,7 @@ class FTSStore:
 
         try:
             rows = self._conn.execute(sql, params).fetchall()
-        except sqlite3.Fts5Error as e:
+        except sqlite3.Error as e:
             logger.warning(f"[fts_store] FTS 查询失败: {e}")
             return []
 

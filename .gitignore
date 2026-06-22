@@ -27,8 +27,8 @@ transformer-review.md
 # 考试经验沉淀系统 - 运行时个人数据（代码和配置应被跟踪）
 shared/exam_memory/experiences/
 shared/exam_memory/bank/*.md
-shared/exam_memory/bank/*.json
 !shared/exam_memory/bank/README.md
+shared/exam_memory/bank/difficulty_stats.json
 shared/exam_memory/user_profile.json
 shared/exam_memory/vectorstore/
 
@@ -72,6 +72,8 @@ targets/*/progress/**
 !targets/*/progress/**/.gitkeep
 targets/*/mistake_log.md
 targets/*/mock_exam_log.md
+targets/*/cheatsheets/*
+targets/*/sources/*
 
 # MCP 与个人记忆工具（仅本地，不入 git）
 .mcp.json
@@ -81,6 +83,10 @@ targets/*/mock_exam_log.md
 .serena/
 .chatmem/
 .mempalace/
+
+# 搜索占位文件和构建产物
+sources/*.md
+shared/exam_memory/exam_memory.egg-info/
 
 # 个人分支私有文件（dev-only，不允许合并到 main）
 skills/branch-ops/

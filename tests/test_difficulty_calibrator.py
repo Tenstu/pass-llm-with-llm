@@ -181,6 +181,20 @@ class TestUtilityMethods:
 # ── QuestionBank 集成 ───────────────────────────────────────────
 
 class TestQuestionBankIntegration:
+    def test_custom_bank_dir_keeps_difficulty_stats_local(self, tmp_path, monkeypatch):
+        """QuestionBank(bank_dir=...) 不应写入默认运行态 stats 文件。"""
+        import exam_memory.question_bank as qb
+
+        default_dir = tmp_path / "default_bank"
+        custom_dir = tmp_path / "custom_bank"
+        monkeypatch.setattr(qb, "BANK_DIR", default_dir)
+
+        bank = qb.QuestionBank(bank_dir=custom_dir)
+        bank._calibrator.record_result("双指针", "困难", correct=True)
+
+        assert (custom_dir / "difficulty_stats.json").exists()
+        assert not (default_dir / "difficulty_stats.json").exists()
+
     def test_calibrate_difficulty_adjusts_frontmatter(self, tmp_path):
         """calibrate_difficulty=True 时 frontmatter 中的 difficulty 被校准。"""
         from exam_memory.question_bank import QuestionBank

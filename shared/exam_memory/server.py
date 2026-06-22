@@ -27,6 +27,7 @@ from exam_memory.frontmatter import parse_frontmatter as _parse_frontmatter
 
 # ── 路径常量 ──────────────────────────────────────────────
 BASE_DIR = Path(__file__).resolve().parent
+REPO_ROOT = BASE_DIR.parents[1]
 EXPERIENCES_DIR = BASE_DIR / "experiences"
 PROFILE_PATH = BASE_DIR / "user_profile.json"
 
@@ -41,6 +42,8 @@ SOURCES_YAML_PATH = BASE_DIR / "sources.yaml"
 _fts_cache: "FTSStore | None" = None
 _vec_cache: "NumpyVectorStore | None" = None
 _profile_lock = threading.Lock()
+_experience_locks_guard = threading.Lock()
+_experience_locks: dict[Path, threading.Lock] = {}
 
 
 def _get_fts():
@@ -57,6 +60,53 @@ def _get_vec():
         from exam_memory.vector_store import NumpyVectorStore
         _vec_cache = NumpyVectorStore()
     return _vec_cache
+
+
+def _lock_for_path(path: Path) -> threading.Lock:
+    resolved = path.resolve()
+    with _experience_locks_guard:
+        lock = _experience_locks.get(resolved)
+        if lock is None:
+            lock = threading.Lock()
+            _experience_locks[resolved] = lock
+        return lock
+
+
+def _write_text_atomic(path: Path, text: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp_path: Path | None = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            "w",
+            encoding="utf-8",
+            dir=path.parent,
+            prefix=f".{path.name}.",
+            suffix=".tmp",
+            delete=False,
+        ) as tmp:
+            tmp_path = Path(tmp.name)
+            tmp.write(text)
+            tmp.flush()
+            os.fsync(tmp.fileno())
+        os.replace(tmp_path, path)
+    finally:
+        if tmp_path is not None and tmp_path.exists():
+            tmp_path.unlink()
+
+
+def _allowed_source_roots() -> tuple[Path, ...]:
+    return (
+        (REPO_ROOT / "targets").resolve(),
+        (REPO_ROOT / "shared" / "cheatsheets").resolve(),
+    )
+
+
+def _is_allowed_source_path(path: Path) -> bool:
+    resolved = path.resolve()
+    return any(
+        resolved == root or resolved.is_relative_to(root)
+        for root in _allowed_source_roots()
+    )
 
 # ── 工具 JSON Schema ─────────────────────────────────────
 TOOL_SCHEMAS = [
@@ -486,21 +536,21 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
         if not target.exists():
             return [TextContent(type="text", text=f"文件不存在: {target.name}")]
 
-        text = target.read_text(encoding="utf-8")
-        meta = _parse_frontmatter(text)
-        old = meta.get("error_count", 0)
-        meta["error_count"] = old + 1
-        meta["last_review"] = datetime.now().strftime("%Y-%m-%d")
+        with _lock_for_path(target):
+            text = target.read_text(encoding="utf-8")
+            meta = _parse_frontmatter(text)
+            old = meta.get("error_count", 0)
+            meta["error_count"] = old + 1
+            meta["last_review"] = datetime.now().strftime("%Y-%m-%d")
 
-        yaml_str = yaml.dump(meta, allow_unicode=True, default_flow_style=False)
-        # 替换 frontmatter
-        if text.startswith("---"):
-            parts = text.split("---", 2)
-            new_text = f"---\n{yaml_str}---{parts[2]}" if len(parts) >= 3 else text
-        else:
-            new_text = f"---\n{yaml_str}---\n{text}"
+            yaml_str = yaml.dump(meta, allow_unicode=True, default_flow_style=False)
+            if text.startswith("---"):
+                parts = text.split("---", 2)
+                new_text = f"---\n{yaml_str}---{parts[2]}" if len(parts) >= 3 else text
+            else:
+                new_text = f"---\n{yaml_str}---\n{text}"
 
-        target.write_text(new_text, encoding="utf-8")
+            _write_text_atomic(target, new_text)
         return [TextContent(type="text", text=f"error_count: {old} → {old + 1}")]
 
     # ── get_user_profile ──
@@ -550,7 +600,10 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
                     continue
                 name_ = src["name"]
                 src_config = src.get("config", {})
-                path = config_dir / src_config.get("path", "")
+                path = (config_dir / src_config.get("path", "")).resolve()
+                if not _is_allowed_source_path(path):
+                    mounted.append(f"{name_}(非法 source 路径: {path})")
+                    continue
                 if not path.exists() or not path.is_dir():
                     mounted.append(f"{name_}(目录不存在: {path})")
                     continue

@@ -427,6 +427,9 @@ class NumpyVectorStore:
         metadata.setdefault("source_dir", "experiences")
         metadata.setdefault("canonical_key", f"{metadata['source_dir']}/{doc_id}")
 
+        if (self._embs is None or len(self._meta) == 0) and EMB_PATH.exists() and META_PATH.exists():
+            self.load()
+
         if self._embs is None or len(self._meta) == 0:
             self._embs = vec
             self._meta = [metadata]

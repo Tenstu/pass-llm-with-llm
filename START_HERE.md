@@ -2,7 +2,7 @@
 
 ## 首次使用？
 
-如果 `HANDOFF.md` 中仍为模板占位符（`<考试名称>`、`YYYY-MM-DD`），说明尚未初始化：
+如果本地 `HANDOFF.md` 不存在，先从 `HANDOFF.example.md` 复制一份。若 `HANDOFF.md` 中仍为模板占位符（`<考试名称>`、`YYYY-MM-DD`），说明尚未初始化：
 
 ```
 Skill(skill="init-guide")
@@ -21,6 +21,8 @@ init-guide 会引导你填写备考目标、考试范围、目标日期，并自
 | **Full MCP Mode** | `exam-memory` MCP 可用，且仓库可写 | Markdown + MCP 双写 |
 | **Local Markdown Mode** | MCP / ChatMem / 本地索引不可用，但仓库可写 | `HANDOFF.md`、daily log、`mistake_log.md`、choice round 文件 |
 | **Stateless Lite Mode** | 仓库不可写、只能聊天继续，或交互式 quiz 工具不可用 | 最终返回 `[MISTAKE_LOG_APPEND]`、`[DAILY_PROBLEM_LOG_APPEND]`、`[CHOICE_ROUND_SUMMARY]`、`[HANDOFF_UPDATE]` |
+
+ChatMem、MemPalace、OneFind 是外部可选的 recall/search 增强，不是 session 启动条件。OneFind 只用于外部知识库的只读检索，不替代 `mistake_log.md` 或 `exam-memory`。
 
 内部降级不阻塞练习；最终报告必须提醒：当前能力已降级、跨会话语义检索/错误频率合并/画像更新不可用、append blocks 需要落到 Markdown。Lite/Portable Mode 只适合临时环境、新用户启动和故障恢复，不建议长期作为唯一工作流。
 
@@ -189,7 +191,7 @@ targets/{target}/mistake_log.md    targets/{target}/topic_checklist.md
                跨会话持久化，下次 choice-q-create 可读取
 ```
 
-`mistake_log.md` 是唯一持久化的错误反馈机制。每道题的错因必须录入，annotation skill 会自动引用。
+`mistake_log.md` 是默认且权威的 Markdown 错误反馈源。每道题的错因必须录入，annotation skill 会自动引用。
 `exam-memory MCP` 是可选增强——提供跨会话经验检索和错误频率追踪。MCP 不可用时不影响核心闭环。
 
 ## 如果时间只剩 1 小时

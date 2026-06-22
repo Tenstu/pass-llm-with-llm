@@ -1,4 +1,4 @@
-# Pass-LLM-with-LLM
+# pass-llm-with-llm
 
 > LLM-powered exam-prep harness for AI and algorithm written exams.
 
@@ -41,13 +41,13 @@ cd pass-llm-with-llm
 1. Open the repository in Claude Code.
 2. Say `init` or `初始化` to run the onboarding guide.
 3. Read [START_HERE.md](START_HERE.md) for the session bootstrap order.
-4. Configure your target in [HANDOFF.md](HANDOFF.md) if needed.
+4. If needed, copy [HANDOFF.example.md](HANDOFF.example.md) to a local `HANDOFF.md` and configure your target.
 
 ### Zero-Dependency Path
 
 For a temporary or first-run setup, you can use the harness with only Markdown files:
 
-1. Fill [HANDOFF.md](HANDOFF.md) with target, exam date, and daily time.
+1. Copy [HANDOFF.example.md](HANDOFF.example.md) to a local `HANDOFF.md`, then fill target, exam date, and daily time.
 2. Create today's `shared/daily/YYYY-MM-DD.md`, or ask the agent to return a `DAILY_PROBLEM_LOG_APPEND` block.
 3. Use `targets/{target}/exam_config.md` for question counts and scoring.
 4. Record mistakes in `targets/{target}/mistake_log.md`, or save the returned `MISTAKE_LOG_APPEND` / `CHOICE_ROUND_SUMMARY` / `HANDOFF_UPDATE` blocks.
@@ -76,7 +76,7 @@ Progress check:
 
 | Mode | Dependencies | Best For |
 |------|--------------|----------|
-| Full MCP Mode | Repository Markdown + optional `exam-memory` MCP | Long-running prep with cross-session retrieval and profile updates |
+| Full MCP Mode | Repository Markdown + working `exam-memory` MCP | Long-running prep with cross-session retrieval and profile updates |
 | Local Markdown Mode | Repository files only | Default low-friction workflow |
 | Stateless Lite Mode | Current chat + returned append blocks | Temporary machines, new-user demos, recovery when files/tools are unavailable |
 
@@ -125,7 +125,7 @@ spaced-repetition, local-first, knowledge-retrieval
 |------|-------------|
 | Session bootstrap | [START_HERE.md](START_HERE.md) |
 | Project rules and skill routing | [AGENTS.md](AGENTS.md) |
-| Current handoff and target setup | [HANDOFF.md](HANDOFF.md) |
+| Current handoff and target setup | Local `HANDOFF.md` from [HANDOFF.example.md](HANDOFF.example.md) |
 | Skill definitions | `skills/` |
 | Target-specific exam material | `targets/{target}/` |
 | Shared MCP server and retrieval helpers | `shared/exam_memory/` |
@@ -144,7 +144,25 @@ The harness works in local Markdown mode first. These integrations add memory or
 
 `exam-memory` is the write-through exam-prep memory layer in this project. OneFind is best treated as a read-oriented external retrieval layer for knowledge you already keep elsewhere. They are complementary rather than substitutes.
 
-To enable the bundled MCP server, install the minimal Python dependencies and register `.mcp.json` with a stdio command that runs `shared/exam_memory/server.py`. Copy `.mcp.example.json` to `.mcp.json` and adjust the Python path. Optionally copy `.env.example` to `.env` for centralized key management. If MCP is unavailable, the Skills fall back to local Markdown files; if files cannot be written, they return append blocks and warn that Lite/Portable Mode should remain temporary.
+Do not merge OneFind into this project's build or index lifecycle. Keep it as an external read-only retrieval layer: it should not write to `mistake_log.md`, replace `exam-memory`, or share `shared/exam_memory/vectorstore/`. Writable exam-prep state remains owned by Markdown and `exam-memory`.
+
+The recommended one-command setup for users is:
+
+```bash
+python scripts/setup_mcp_tools.py --recommended
+```
+
+That installs and registers only the bundled `exam-memory` tool. If ChatMem, MemPalace, or OneFind is already installed by the user, register those local tools with:
+
+```bash
+python scripts/setup_mcp_tools.py --configure-installed-external
+# or register only OneFind
+python scripts/setup_mcp_tools.py --config-only onefind
+```
+
+`--all` is an advanced entry point. It tries to install/configure every tool, but missing external programs such as ChatMem or OneFind are reported as optional setup prompts, not project build or initialization blockers.
+
+To manually enable the bundled MCP server, install the minimal Python dependencies and register `.mcp.json` with a stdio command that runs `shared/exam_memory/server.py`. Copy `.mcp.example.json` to `.mcp.json` and adjust the Python path. Optionally copy `.env.example` to `.env` for centralized key management. If MCP is unavailable, the Skills fall back to local Markdown files; if files cannot be written, they return append blocks and warn that Lite/Portable Mode should remain temporary.
 
 ### Optional Capability Setup
 
@@ -152,7 +170,7 @@ The base harness does not need an online model, embedding model, GPU, or MCP ser
 
 | Capability | Install | Configure |
 |------------|---------|-----------|
-| `exam-memory` MCP | `cd shared/exam_memory` then `pip install .` | copy `.mcp.example.json` to your local `.mcp.json` and adjust paths if needed |
+| `exam-memory` MCP | `python scripts/setup_mcp_tools.py --recommended`, or `cd shared/exam_memory` then `pip install -e ".[embed,generate]"` | the script writes local `.mcp.json`; for manual setup copy `.mcp.example.json` and adjust paths if needed |
 | Semantic retrieval with local embeddings | `pip install ".[embed]"` | default local model is `BAAI/bge-m3`; first use downloads it through Hugging Face cache |
 | Question generation LLM | `pip install ".[generate]"` | set `EXAM_MEMORY_LLM_MODEL`; there is no default online model |
 
@@ -217,8 +235,9 @@ export OPENAI_API_KEY=local-placeholder
 pass-llm-with-llm/
   AGENTS.md                    # Agent execution contract and skill routing
   START_HERE.md                # Session bootstrap guide
-  HANDOFF.md                   # Session handoff and target setup
-  README.md                    # Chinese documentation (GitHub homepage default)
+  HANDOFF.example.md           # Public session handoff template
+  HANDOFF.md                   # Local/dev session handoff and target setup
+  README.md                    # Chinese documentation (default on GitHub)
   README_EN.md                 # English documentation
 
   skills/                      # Claude Code Skill definitions
@@ -248,7 +267,7 @@ pass-llm-with-llm/
 2. Update `targets/{target}/exam_config.md` with question counts, scoring, and timing.
 3. Put exam-specific patterns under `targets/{target}/sources/`.
 4. Put target-specific notes under `targets/{target}/cheatsheets/`; keep reusable notes under `shared/cheatsheets/`.
-5. Update [HANDOFF.md](HANDOFF.md) so future sessions know the active target.
+5. Update local `HANDOFF.md` so future sessions know the active target.
 
 ## Roadmap
 
@@ -285,12 +304,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for path rules and PR expectations.
 
 ## Acknowledgements
 
-This project grew out of personal exam-prep practice for algorithm and AI written exams. It draws on ideas from two open-source projects:
-
-- [ChatMem](https://github.com/Rimagination/ChatMem) — cross-conversation search and session continuation patterns that influenced the handoff and recall design.
-- [OneFind](https://github.com/iawnfoanaowt/OneFind) — local-first knowledge-base indexing that influenced the retrieval and source-registry approach.
-
-Both are external, optional integrations; this repository does not redistribute their code or present itself as an official extension of either project. The harness combines these ideas with hands-on exam practice, structured around harness engineering principles: repeatable loops, explicit state files, and minimal mandatory dependencies.
+This project is inspired in part by [OneFind](https://github.com/iawnfoanaowt/OneFind), especially its local-first retrieval orientation and the idea that agent-facing tools should make personal knowledge easier to search and reuse. OneFind is an external project and optional integration; this repository does not redistribute OneFind code or present itself as an official OneFind extension.
 
 ## License
 

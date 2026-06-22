@@ -474,7 +474,7 @@ class QuestionBank:
         self._parser = QuestionParser()
         self._validator = QualityValidator()
         self._stem_prefix_len = 50  # 去重：题干前 N 字符比对
-        self._calibrator = DifficultyCalibrator(BANK_DIR / "difficulty_stats.json")
+        self._calibrator = DifficultyCalibrator(self.bank_dir / "difficulty_stats.json")
 
         # 语义去重索引（惰性初始化）
         self._semantic_available: bool = False

@@ -10,9 +10,10 @@ def test_target_wildcards_do_not_match_unrelated_target_files():
     allowed = [
         "targets/exam_config_template.md",
         "targets/ai-lab/exam_config.md",
-        "targets/ai-lab/cheatsheets/math_fundamentals.md",
         "shared/exam_memory/server.py",
         "README.md",
+        "README_EN.md",
+        "HANDOFF.example.md",
     ]
 
     for path in allowed:
@@ -28,6 +29,8 @@ def test_target_file_wildcards_match_exact_single_target_segment():
 def test_target_directory_wildcards_match_directory_and_children():
     assert _matches_denylist("targets/ai-lab/progress") == "targets/*/progress/"
     assert _matches_denylist("targets/ai-lab/progress/rounds/r1.md") == "targets/*/progress/"
+    assert _matches_denylist("targets/ai-lab/cheatsheets/math_fundamentals.md") == "targets/*/cheatsheets/"
+    assert _matches_denylist("targets/ai-lab/sources/source_index.md") == "targets/*/sources/"
     assert _matches_denylist("targets/foo/bar/progress/r1.md") is None
 
 
@@ -46,6 +49,20 @@ def test_runtime_bank_stats_are_dev_only():
         _matches_denylist("shared/exam_memory/bank/difficulty_stats.json")
         == "shared/exam_memory/bank/difficulty_stats.json"
     )
+
+
+def test_dev_only_regression_tests_are_not_public_extraction_candidates():
+    blocked = [
+        "tests/test_chunking.py",
+        "tests/test_fts_store.py",
+        "tests/test_hybrid_search.py",
+        "tests/test_security.py",
+        "tests/test_server.py",
+        "tests/test_vector_store.py",
+    ]
+
+    for path in blocked:
+        assert _matches_denylist(path) == path
 
 
 def test_sensitive_root_config_is_dev_only_with_public_examples_allowed():
