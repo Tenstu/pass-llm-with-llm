@@ -45,6 +45,11 @@ distill-export = "exam_memory.distill_export:main"
 requires = ["setuptools>=68.0"]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools.packages.find]
-where = ["."]
-include = ["exam_memory*"]
+[tool.setuptools]
+packages = ["exam_memory"]
+
+[tool.setuptools.package-dir]
+exam_memory = "."
+
+[tool.setuptools.package-data]
+exam_memory = ["sources.yaml", "bank/README.md"]

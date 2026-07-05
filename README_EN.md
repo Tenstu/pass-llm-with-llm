@@ -146,13 +146,21 @@ The harness works in local Markdown mode first. These integrations add memory or
 
 Do not merge OneFind into this project's build or index lifecycle. Keep it as an external read-only retrieval layer: it should not write to `mistake_log.md`, replace `exam-memory`, or share `shared/exam_memory/vectorstore/`. Writable exam-prep state remains owned by Markdown and `exam-memory`.
 
-The recommended one-command setup for users is:
+The recommended setup entry point for users is:
+
+```bash
+python scripts/setup_mcp_tools.py
+```
+
+It first checks local MCP status. If the bundled `exam-memory` tool is not installed, it asks whether to install and register it now. In non-interactive environments, or when you already know you want the recommended setup, run:
 
 ```bash
 python scripts/setup_mcp_tools.py --recommended
+# or auto-confirm from the default entry point
+python scripts/setup_mcp_tools.py --yes
 ```
 
-That installs and registers only the bundled `exam-memory` tool. If ChatMem, MemPalace, or OneFind is already installed by the user, register those local tools with:
+The recommended path installs and registers only the minimal runtime dependencies for the bundled `exam-memory` tool. It does not force local embeddings, online question generation, or external memory tools. If ChatMem, MemPalace, or OneFind is already installed by the user, register those local tools with:
 
 ```bash
 python scripts/setup_mcp_tools.py --configure-installed-external
@@ -160,7 +168,7 @@ python scripts/setup_mcp_tools.py --configure-installed-external
 python scripts/setup_mcp_tools.py --config-only onefind
 ```
 
-`--all` is an advanced entry point. It tries to install/configure every tool, but missing external programs such as ChatMem or OneFind are reported as optional setup prompts, not project build or initialization blockers.
+`--check` reports both installation status and whether each tool has been written to `.mcp.json`. `--all` is an advanced entry point. It tries to install/configure every tool, but missing external programs such as ChatMem or OneFind are reported as optional setup prompts, not project build or initialization blockers. External tool locations can be overridden with `CHATMEM_HOME` / `CHATMEM_MCP` / `CHATMEM_EXE`, and `ONEFIND_HOME`.
 
 To manually enable the bundled MCP server, install the minimal Python dependencies and register `.mcp.json` with a stdio command that runs `shared/exam_memory/server.py`. Copy `.mcp.example.json` to `.mcp.json` and adjust the Python path. Optionally copy `.env.example` to `.env` for centralized key management. If MCP is unavailable, the Skills fall back to local Markdown files; if files cannot be written, they return append blocks and warn that Lite/Portable Mode should remain temporary.
 
@@ -170,7 +178,7 @@ The base harness does not need an online model, embedding model, GPU, or MCP ser
 
 | Capability | Install | Configure |
 |------------|---------|-----------|
-| `exam-memory` MCP | `python scripts/setup_mcp_tools.py --recommended`, or `cd shared/exam_memory` then `pip install -e ".[embed,generate]"` | the script writes local `.mcp.json`; for manual setup copy `.mcp.example.json` and adjust paths if needed |
+| `exam-memory` MCP | `python scripts/setup_mcp_tools.py --recommended`, or `cd shared/exam_memory` then `pip install -e .` | the script writes local `.mcp.json`; for manual setup copy `.mcp.example.json` and adjust paths if needed |
 | Semantic retrieval with local embeddings | `pip install ".[embed]"` | default local model is `BAAI/bge-m3`; first use downloads it through Hugging Face cache |
 | Question generation LLM | `pip install ".[generate]"` | set `EXAM_MEMORY_LLM_MODEL`; there is no default online model |
 

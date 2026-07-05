@@ -146,13 +146,21 @@ spaced-repetition, local-first, knowledge-retrieval
 
 OneFind 和本项目的构建/索引不要合并：OneFind 保持外部只读检索层，不写入 `mistake_log.md`、不替代 `exam-memory`，也不共享 `shared/exam_memory/vectorstore/`。项目内可写的备考状态仍以 Markdown 和 `exam-memory` 为准。
 
-面向使用者的推荐一键入口是：
+面向使用者的推荐入口是直接运行安装检查脚本：
+
+```bash
+python scripts/setup_mcp_tools.py
+```
+
+它会先检查本机 MCP 状态；如果项目自带的 `exam-memory` 尚未安装，会提示是否一键安装并注册。非交互环境或已经确认要安装时，可直接运行：
 
 ```bash
 python scripts/setup_mcp_tools.py --recommended
+# 或在默认入口里自动确认
+python scripts/setup_mcp_tools.py --yes
 ```
 
-它只安装并注册项目自带的 `exam-memory`。如果 ChatMem、MemPalace 或 OneFind 已经由用户手动安装，可再运行：
+推荐入口只安装并注册项目自带的 `exam-memory` 最小运行依赖，不会强制安装本地 embedding、在线出题或外部记忆工具。如果 ChatMem、MemPalace 或 OneFind 已经由用户手动安装，可再运行：
 
 ```bash
 python scripts/setup_mcp_tools.py --configure-installed-external
@@ -160,7 +168,7 @@ python scripts/setup_mcp_tools.py --configure-installed-external
 python scripts/setup_mcp_tools.py --config-only onefind
 ```
 
-`--all` 是高级入口：会尝试安装/配置所有工具，但 ChatMem 和 OneFind 这类外部程序缺失时只提示下载方式，不作为项目构建或初始化的前置条件。
+`--check` 会同时显示“已安装”和“已写入 `.mcp.json`”两类状态。`--all` 是高级入口：会尝试安装/配置所有工具，但 ChatMem 和 OneFind 这类外部程序缺失时只提示下载方式，不作为项目构建或初始化的前置条件。外部工具可用环境变量覆盖默认路径：`CHATMEM_HOME` / `CHATMEM_MCP` / `CHATMEM_EXE`，以及 `ONEFIND_HOME`。
 
 如需手动启用项目自带 MCP server，安装最小 Python 依赖，复制 `.mcp.example.json` 为本机 `.mcp.json`，复制 `.env.example` 为本机 `.env`，在 `.mcp.json` 中注册运行 `shared/exam_memory/server.py` 的 stdio 命令。MCP 不可用时，Skills 会自动回退到本地 Markdown 文件；文件也不可写时，会返回 append blocks，并提醒 Lite/Portable Mode 只适合临时使用。
 
@@ -170,7 +178,7 @@ python scripts/setup_mcp_tools.py --config-only onefind
 
 | 能力 | 安装方式 | 配置方式 |
 |------|----------|----------|
-| `exam-memory` MCP | `python scripts/setup_mcp_tools.py --recommended`，或 `cd shared/exam_memory` 后运行 `pip install -e ".[embed,generate]"` | 脚本会写入本机 `.mcp.json`；手动安装时可复制 `.mcp.example.json` 后调整路径 |
+| `exam-memory` MCP | `python scripts/setup_mcp_tools.py --recommended`，或 `cd shared/exam_memory` 后运行 `pip install -e .` | 脚本会写入本机 `.mcp.json`；手动安装时可复制 `.mcp.example.json` 后调整路径 |
 | 本地 embedding 语义检索 | `pip install ".[embed]"` | 当前默认本地模型为 `BAAI/bge-m3`，首次使用会走 Hugging Face 缓存下载 |
 | 在线出题 LLM | `pip install ".[generate]"` | 设置 `EXAM_MEMORY_LLM_MODEL`；项目不提供默认在线模型 |
 

@@ -4,6 +4,7 @@ r"""
 MCP 增强工具安装/配置脚本。
 
 用法:
+  python setup_mcp_tools.py
   python setup_mcp_tools.py --recommended
   python setup_mcp_tools.py --all
   python setup_mcp_tools.py --exam-memory-only
@@ -22,7 +23,7 @@ import os
 import shutil
 import subprocess
 import sys
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -43,25 +44,77 @@ class ToolInfo:
 
 # ── detection functions ────────────────────────────────────────────
 
+def _check_python_modules(*module_names: str) -> bool:
+    probe = (
+        "import importlib.util, sys\n"
+        "missing = [name for name in sys.argv[1:] if importlib.util.find_spec(name) is None]\n"
+        "raise SystemExit(1 if missing else 0)\n"
+    )
+    try:
+        result = subprocess.run(
+            [sys.executable, "-c", probe, *module_names],
+            cwd=str(REPO_ROOT),
+            capture_output=True,
+            text=True,
+            timeout=15,
+        )
+        return result.returncode == 0
+    except Exception:
+        return False
+
+
+def _chatmem_paths() -> list[Path]:
+    paths: list[Path] = []
+    for env_name in ("CHATMEM_MCP", "CHATMEM_EXE"):
+        if os.environ.get(env_name):
+            paths.append(Path(os.environ[env_name]).expanduser())
+    if os.environ.get("CHATMEM_HOME"):
+        home = Path(os.environ["CHATMEM_HOME"]).expanduser()
+        paths.extend([home / "chatmem-mcp.exe", home / "ChatMem.exe"])
+    paths.extend(
+        [
+            Path("D:/Programe/chatmem/chatmem-mcp.exe"),
+            Path("D:/Programe/chatmem/ChatMem.exe"),
+        ]
+    )
+    for command in ("chatmem-mcp", "ChatMem"):
+        found = shutil.which(command)
+        if found:
+            paths.append(Path(found))
+    return paths
+
+
+def _first_existing(paths: list[Path]) -> Path | None:
+    for path in paths:
+        if path.exists():
+            return path
+    return None
+
+
+def _onefind_home() -> Path:
+    return Path(os.environ.get("ONEFIND_HOME", "D:/tools/onefind")).expanduser()
+
+
 def _check_exam_memory() -> bool:
     server = REPO_ROOT / "shared" / "exam_memory" / "server.py"
-    return server.exists()
+    return server.exists() and _check_python_modules("exam_memory.server", "mcp", "yaml")
 
 
 def _check_chatmem() -> bool:
-    paths = [
-        Path("D:/Programe/chatmem/ChatMem.exe"),
-        Path("D:/Programe/chatmem/chatmem-mcp.exe"),
-    ]
-    return any(p.exists() for p in paths)
+    return _first_existing(_chatmem_paths()) is not None
 
 
 def _check_mempalace() -> bool:
-    return shutil.which("mempalace-mcp") is not None or shutil.which("mempalace") is not None
+    return (
+        shutil.which("mempalace-mcp") is not None
+        or shutil.which("mempalace") is not None
+        or _check_python_modules("mempalace.mcp_server")
+    )
 
 
 def _check_onefind() -> bool:
-    return Path("D:/tools/onefind").exists() and (Path("D:/tools/onefind") / "kb_ask.cmd").exists()
+    home = _onefind_home()
+    return (home / "kb_ask.cmd").exists() or (home / "kb_bootstrap_runtime.cmd").exists()
 
 
 # ── config generators ──────────────────────────────────────────────
@@ -81,14 +134,14 @@ def _cfg_exam_memory() -> dict:
 
 
 def _cfg_chatmem() -> dict:
-    exe_path = "D:/Programe/chatmem/ChatMem.exe"
-    if Path("D:/Programe/chatmem/chatmem-mcp.exe").exists():
+    exe_path = _first_existing(_chatmem_paths()) or Path("D:/Programe/chatmem/ChatMem.exe")
+    if "mcp" in exe_path.stem.lower():
         return {
-            "command": "D:/Programe/chatmem/chatmem-mcp.exe",
+            "command": str(exe_path),
             "args": [],
         }
     return {
-        "command": "D:/Programe/chatmem/ChatMem.exe",
+        "command": str(exe_path),
         "args": ["--mcp"],
     }
 
@@ -118,10 +171,11 @@ def _cfg_mempalace() -> dict:
 
 
 def _cfg_onefind() -> dict:
+    home = _onefind_home()
     return {
-        "command": "D:/tools/onefind/kb_bootstrap_runtime.cmd",
+        "command": str(home / "kb_bootstrap_runtime.cmd"),
         "args": [],
-        "cwd": "D:/tools/onefind",
+        "cwd": str(home),
     }
 
 
@@ -129,14 +183,14 @@ TOOLS: list[ToolInfo] = [
     ToolInfo(
         name="exam-memory",
         description="项目自带 MCP — 跨会话错题持久化、语义检索、用户画像",
-        install_hint="cd shared/exam_memory && pip install -e '.[embed]'",
+        install_hint="cd shared/exam_memory && pip install -e .",
         check_func=_check_exam_memory,
         config_func=_cfg_exam_memory,
     ),
     ToolInfo(
         name="chatmem",
         description="ChatMem — 对话级记忆，用于交接/继续/项目历史回忆",
-        install_hint="从 https://github.com/Rimagination/ChatMem/releases 下载 ChatMem.exe，放置于 D:\\Programe\\chatmem\\",
+        install_hint="从 https://github.com/Rimagination/ChatMem/releases 下载；可设置 CHATMEM_HOME/CHATMEM_MCP/CHATMEM_EXE",
         check_func=_check_chatmem,
         config_func=_cfg_chatmem,
     ),
@@ -150,7 +204,7 @@ TOOLS: list[ToolInfo] = [
     ToolInfo(
         name="onefind",
         description="OneFind — 外部本地知识库检索（Obsidian/Zotero/文件夹等）",
-        install_hint="从 https://github.com/iawnfoanaowt/OneFind/releases 下载并解压到 D:\\tools\\onefind\\",
+        install_hint="从 https://github.com/iawnfoanaowt/OneFind/releases 下载并解压；可设置 ONEFIND_HOME",
         check_func=_check_onefind,
         config_func=_cfg_onefind,
     ),
@@ -175,10 +229,12 @@ def save_config(cfg: dict) -> None:
 
 def check_all() -> dict[str, dict]:
     results = {}
+    servers = load_config().get("mcpServers", {})
     for tool in TOOLS:
         installed = tool.check_func()
         results[tool.name] = {
             "installed": installed,
+            "configured": tool.name in servers,
             "description": tool.description,
             "install_hint": tool.install_hint,
         }
@@ -198,14 +254,14 @@ def install_tool(name: str, force: bool = False) -> tuple[bool, str]:
         return _pip_install_exam_memory()
     elif name == "chatmem":
         return False, (
-            f"ChatMem 需要手动安装。请从 GitHub Releases 下载 ChatMem.exe 放置于 D:\\Programe\\chatmem\\\n"
+            f"ChatMem 需要手动安装。请从 GitHub Releases 下载；可设置 CHATMEM_HOME、CHATMEM_MCP 或 CHATMEM_EXE。\n"
             f"下载地址: https://github.com/Rimagination/ChatMem/releases"
         )
     elif name == "mempalace":
         return _pip_install_mempalace()
     elif name == "onefind":
         return False, (
-            f"OneFind 需要手动安装。请从 GitHub Releases 下载并解压到 D:\\tools\\onefind\\\n"
+            f"OneFind 需要手动安装。请从 GitHub Releases 下载并解压；可设置 ONEFIND_HOME。\n"
             f"下载地址: https://github.com/iawnfoanaowt/OneFind/releases"
         )
 
@@ -218,7 +274,7 @@ def _pip_install_exam_memory() -> tuple[bool, str]:
         return False, f"目录不存在: {target}"
     try:
         result = subprocess.run(
-            [sys.executable, "-m", "pip", "install", "-e", ".[embed,generate]"],
+            [sys.executable, "-m", "pip", "install", "-e", "."],
             cwd=str(target),
             capture_output=True,
             text=True,
@@ -339,6 +395,36 @@ def _print_report(report: dict[str, dict]) -> None:
             print(f"    {step_status} {step}: {msg}")
 
 
+def _answer_yes(answer: str, default: bool = True) -> bool:
+    normalized = answer.strip().lower()
+    if not normalized:
+        return default
+    return normalized in {"y", "yes", "1", "true", "是", "好", "安装", "确认"}
+
+
+def _prompt_yes_no(question: str, default: bool = True) -> bool:
+    suffix = "[Y/n]" if default else "[y/N]"
+    try:
+        return _answer_yes(input(f"{question} {suffix} "), default=default)
+    except (EOFError, KeyboardInterrupt):
+        print()
+        return False
+
+
+def _print_check_results(results: dict[str, dict], heading: str) -> None:
+    print(heading)
+    print()
+    for name, info in results.items():
+        status = "[OK]" if info["installed"] else "[MISSING]"
+        config = "[CONFIGURED]" if info.get("configured") else "[NOT CONFIGURED]"
+        print(f"  {status} {config} {name}: {info['description']}")
+        if not info["installed"]:
+            print(f"      安装方式: {info['install_hint']}")
+        elif not info.get("configured"):
+            print(f"      配置方式: python scripts/setup_mcp_tools.py --config-only {name}")
+    print()
+
+
 def main():
     _make_stdio_safe()
 
@@ -355,19 +441,14 @@ def main():
     parser.add_argument("--remove", metavar="NAME", help="从 .mcp.json 移除指定工具")
     parser.add_argument("--config-only", metavar="NAME", help="仅写入 .mcp.json 配置（不安装）")
     parser.add_argument("--force", action="store_true", help="强制重新安装")
+    parser.add_argument("--yes", action="store_true", help="默认入口下自动确认推荐一键安装")
+    parser.add_argument("--no-input", action="store_true", help="默认入口下只检查，不交互提示")
 
     args = parser.parse_args()
 
     if args.check:
         results = check_all()
-        print("MCP 工具安装状态检查:")
-        print()
-        for name, info in results.items():
-            status = "[OK]" if info["installed"] else "[MISSING]"
-            print(f"  {status} {name}: {info['description']}")
-            if not info["installed"]:
-                print(f"      安装方式: {info['install_hint']}")
-        print()
+        _print_check_results(results, "MCP 工具安装状态检查:")
         return
 
     if args.all:
@@ -405,22 +486,34 @@ def main():
         print(f"  {status} {msg}")
 
     else:
-        # Default: check all
-        args.check = True
         results = check_all()
-        print("MCP 工具安装状态:")
-        print()
-        for name, info in results.items():
-            status = "[OK]" if info["installed"] else "[MISSING]"
-            print(f"  {status} {name}: {info['description']}")
-            if not info["installed"]:
-                print(f"      安装方式: {info['install_hint']}")
-        print()
+        _print_check_results(results, "MCP 工具安装状态:")
         not_installed = [n for n, i in results.items() if not i["installed"]]
         if not_installed:
             print(f"  未安装: {', '.join(not_installed)}")
             print("  推荐使用 --recommended 启用项目自带 exam-memory。")
             print("  外部工具请先手动安装，再用 --configure-installed-external 或 --config-only <name> 注册。")
+        if results["exam-memory"]["installed"] and not results["exam-memory"]["configured"]:
+            print()
+            print("  exam-memory 已安装但尚未写入 .mcp.json，可运行 --config-only exam-memory。")
+        if results["exam-memory"]["installed"]:
+            return
+        if args.no_input:
+            print()
+            print("  已跳过交互提示；需要一键安装时运行: python scripts/setup_mcp_tools.py --recommended")
+            return
+        should_install = args.yes
+        if not should_install and sys.stdin.isatty():
+            print()
+            should_install = _prompt_yes_no("是否现在一键安装并注册推荐项 exam-memory？", default=True)
+        if should_install:
+            print()
+            print("正在安装 exam-memory...")
+            report = setup_exam_memory_only()
+            _print_report(report)
+        else:
+            print()
+            print("  已跳过一键安装；之后可运行: python scripts/setup_mcp_tools.py --recommended")
 
 
 if __name__ == "__main__":
